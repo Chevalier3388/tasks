@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment
+env/
+venv/
+.venv/
+melody_env/
+.app_venv/
+tasks_venv/
+.Python
+
+
+# Ignore .env files (важно, чтобы не загружать пароли и API-ключи)
+.env
+.env.local
+.env.*.local
+.envrc
+
+
+# Logs and local database files
+logs/
+*.log
+*.sqlite3
+*.db
+
+# IDE/Editor settings
+.vscode/
+.idea/
+*.iml
+
+# Alembic migrations cache
+alembic/versions/*.pyc
+
+# Docker files
+docker-compose.override.yml
+*.pid
+
+# MacOS & Linux system files
+.DS_Store
+*.swp
