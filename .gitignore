@@ -43,3 +43,4 @@ docker-compose.override.yml
 # MacOS & Linux system files
 .DS_Store
 *.swp
+task_test.py
