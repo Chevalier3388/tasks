@@ -4,6 +4,7 @@
 # Формат вывода
 # Выведите одно целое число — длину самого длинного палиндрома в записи. Если такого нет, выведите 0.
 
+
 def pal(string):
     return string == string[::-1] and len(string) > 1
 
@@ -14,13 +15,19 @@ def max_len(string):
     lst = []
     for i in range(len(string)):
         for j in range(i, len(string)):
-            sub = string[i: j + 1]
+            sub = string[i : j + 1]
             if pal(sub):
                 lst.append(len(sub))
     return max(lst) if lst else 0
 
 
-lst_test_string = ["1 2 3 4 3 2 1", "1 2 3 4 5", "1 2 3 4 5 5 4 3 2 1", "1 2 3 1 2 3", "112"]
+lst_test_string = [
+    "1 2 3 4 3 2 1",
+    "1 2 3 4 5",
+    "1 2 3 4 5 5 4 3 2 1",
+    "1 2 3 1 2 3",
+    "112",
+]
 
 for el in lst_test_string:
     print(max_len(el))

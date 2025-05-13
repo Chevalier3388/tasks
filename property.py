@@ -20,7 +20,6 @@ class Person:
         self.last_name = None
 
 
-
 person = Person("Vanya", "Drago")
 
 print(person.full_name)
