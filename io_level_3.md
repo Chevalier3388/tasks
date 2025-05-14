@@ -24,8 +24,6 @@ async def main():
     await asyncio.gather(work_a("A"), work_a("B"))
 
 asyncio.run(main())
-
-print("trio")
 ```
 
 Альтернатива с фокусом на structured concurrency.
@@ -34,6 +32,7 @@ print("trio")
 Меньше экосистема, но отличная читаемость и отладка.
 
 ``` python 3
+print("trio")
 import trio
 
 async def work_t(name):
@@ -46,8 +45,6 @@ async def main():
         nursery.start_soon(work_t, "B")
 
 trio.run(main)
-
-print("uvloop")
 ```
 
 Быстрый event loop, реализованный на Cython (на базе libuv — та же основа, что и у Node.js).
@@ -56,6 +53,7 @@ print("uvloop")
 Меняет только внутренности event loop'а, API тот же.
 
 ``` python 3
+print("uvloop")
 import asyncio
 import uvloop
 
@@ -69,8 +67,6 @@ async def main():
     await asyncio.gather(work_u("A"), work_u("B"))
 
 asyncio.run(main())
-
-print("Gevent")
 ```
 
 Основан на greenlet'ах — микропотоках (green threads).
@@ -87,6 +83,7 @@ print("Gevent")
 Тебе важна прозрачность и контроль, а не implicit monkey-patching.
 
 ``` python 3
+print("Gevent")
 import gevent
 from gevent import monkey
 monkey.patch_all()
