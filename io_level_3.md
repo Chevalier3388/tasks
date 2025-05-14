@@ -33,7 +33,7 @@ print("trio")
 Лучше защищает от утечек задач и race conditions.
 Меньше экосистема, но отличная читаемость и отладка.
 
-```
+``` python 3
 import trio
 
 async def work_t(name):
