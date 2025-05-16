@@ -27,14 +27,14 @@ def timeit(log):
             flag = True
             try:
                  return func(*args, **kwargs)
-            except Exception as e:
+            except:
                 flag = False
-                raise e
+                raise
             finally:
                 stop = time.monotonic()
                 delta = stop - start
-                log_method = log.info if flag else log.error
-                log_method("%s(%s) %.1f sec" %(func.__name__, params_func, delta))
+                level = logging.INFO if flag else logging.ERROR
+                log.log(level, "%s(%s) %.1f sec", func.__name__, params_func, delta)
         return inner                                                                                    
     return wrapper                                                                                      
 
