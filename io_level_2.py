@@ -8,7 +8,6 @@
 4. gather, chain, cancel, join, is_coroutine разработчик должен знать и уметь использовать функции и методы.
 """
 
-
 """
 1. Асинхронный ввод.вывод - это модель программирования, 
 которая позволяет выполнять несколько задач одновременно не блокируя выполнение программы.
@@ -35,15 +34,19 @@ TaskGroup — группа задач, которая позволяет упр�
 import asyncio
 
 print("Task")
+
+
 async def say_hello_t(name):
     await asyncio.sleep(1)
     return f"Hello, {name}"
+
 
 async def main():
     task = asyncio.create_task(say_hello_t("Alice"))  # создаём Task
     print(f"task: {task}")
     result = await task  # дожидаемся завершения задачи
     print(result)
+
 
 asyncio.run(main())
 """
@@ -53,9 +56,12 @@ asyncio.create_task() создаёт задачу (Task), которая вып�
 
 # Future
 print("Future")
+
+
 async def say_hello_f(name, future):
     await asyncio.sleep(1)
     future.set_result(f"Hello, {name}")  # устанавливаем результат в future
+
 
 async def main():
     loop = asyncio.get_event_loop()
@@ -63,6 +69,7 @@ async def main():
     print(f"future: {future}")
     await say_hello_f("Bob", future)
     print(future.result())  # выводим результат из Future
+
 
 asyncio.run(main())
 """
@@ -74,9 +81,12 @@ asyncio.run(main())
 
 # TaskGroup
 print("TaskGroup")
+
+
 async def say_hello_t_g(name):
     await asyncio.sleep(1)
     print(f"Hello, {name}")
+
 
 async def main():
     async with asyncio.TaskGroup() as tg:
@@ -84,12 +94,12 @@ async def main():
         tg.create_task(say_hello_t_g("Bob"))
     # После выхода из блока with, все задачи завершены.
 
+
 asyncio.run(main())
 """
 Мы используем async with asyncio.TaskGroup() для управления несколькими задачами.
 Когда все задачи завершатся, программа продолжит выполнение.
 """
-
 
 
 """
@@ -100,17 +110,17 @@ join — блокирует выполнение до завершения вс�
 is_coroutine — проверяет, является ли объект корутиной.
 """
 print("gather")
+
+
 # gather
 async def say_hello(name):
     await asyncio.sleep(1)
     print(f"Hello, {name}")
 
+
 async def main():
-    await asyncio.gather(
-        say_hello("Alice"),
-        say_hello("Bob"),
-        say_hello("Charlie")
-    )
+    await asyncio.gather(say_hello("Alice"), say_hello("Bob"), say_hello("Charlie"))
+
 
 asyncio.run(main())
 """
@@ -120,6 +130,8 @@ asyncio.gather() позволяет одновременно запускать 
 
 # chain, cancel, join, is_coroutine
 print("chain, cancel, join, is_coroutine")
+
+
 async def task1():
     await asyncio.sleep(2)
     print("Task 1 completed")
@@ -144,12 +156,14 @@ async def task2():
 Если ты сразу вызываешь cancel(), то задача:
 получает CancelledError, просто завершает своё выполнение с флагом cancelled
 """
+
+
 async def main():
 
     task1_ = asyncio.create_task(task1())  # создаём задачу
     task2_ = asyncio.create_task(task2())  # создаём задачу
 
-    await asyncio.sleep(0.1) # без этого таска даже не отобразится в
+    await asyncio.sleep(0.1)  # без этого таска даже не отобразится в
     # Пример использования cancel()
     task2_.cancel()  # отменяем task2
 
@@ -173,6 +187,7 @@ async def main():
     async for result in asyncio.as_completed([task1_, task2_]):
         print(result)
 
+
 asyncio.run(main())
 
 """
@@ -188,6 +203,7 @@ chain — используется через asyncio.as_completed() для то
 """
 print("Отдельно разобрать cancel()")
 
+
 async def my_task():
     print("START task")  # <- не будет вызвано, если cancel сработает до запуска
     try:
@@ -199,6 +215,7 @@ async def my_task():
     finally:
         print("FINALLY")
 
+
 async def main():
     task = asyncio.create_task(my_task())
     await asyncio.sleep(0.1)  # даём loop'у шанс запустить задачу
@@ -209,6 +226,7 @@ async def main():
         await task
     except asyncio.CancelledError:
         print("MAIN caught cancellation")
+
 
 asyncio.run(main())
 """

@@ -9,9 +9,7 @@ import asyncio  # Импортируем модуль asyncio
 
 
 async def say_hello(t_e):  # async def определяет корутину
-    await asyncio.sleep(
-        t_e
-    )  # await - это ключевое слово,
+    await asyncio.sleep(t_e)  # await - это ключевое слово,
     # которое говорит Python: "Останови выполнение текущей корутины,
     # пока не получишь результат от другой".
     # asyncio.sleep() — это асинхронная операция.
@@ -23,9 +21,12 @@ if (
     __name__ == "__main__"
 ):  # это хороший стиль, позволяет использовать модуль как импортируемый
 
-    time_sleep = int(input("Enter the number of seconds in standby mode: "))  # переменная для динамического указания секунд сна
-    asyncio.run(say_hello(time_sleep))  # Создаёт цикл событий(event loop), запускает корутину, закрывает цикл по завершении
-
+    time_sleep = int(
+        input("Enter the number of seconds in standby mode: ")
+    )  # переменная для динамического указания секунд сна
+    asyncio.run(
+        say_hello(time_sleep)
+    )  # Создаёт цикл событий(event loop), запускает корутину, закрывает цикл по завершении
 
 
 """
@@ -36,21 +37,24 @@ async def создаёт корутину.
 Чтобы она начала выполняться, её нужно "ожидать" — через await или запустить через asyncio.run().
 """
 
+
 async def greet(name):
     print(f"Привет {name}")
 
-coro = greet("Moby Dick")   # Это не вызов функции как обычно!
-print(coro)      # <coroutine object greet at 0x...>
+
+coro = greet("Moby Dick")  # Это не вызов функции как обычно!
+print(coro)  # <coroutine object greet at 0x...>
 
 asyncio.run(greet("Tim"))  # Вернёт: Привет Tim
 
-async def main(name):   # создаём обёртку, над корутиной, что бы она выполнилась.
+
+async def main(name):  # создаём обёртку, над корутиной, что бы она выполнилась.
     # Этот подход через main() очень полезен, когда нужно await-ить несколько корутин
     coro = greet(name)  # создаём объект-корутину
-    await coro      # здесь она действительно выполняется
+    await coro  # здесь она действительно выполняется
+
 
 asyncio.run(main("Jack"))  # Вернёт: Привет Jack
-
 
 
 """
@@ -116,4 +120,3 @@ asyncio.sleep(3) — это асинхронная задержка, она не
 При вызове в цикле событий, она выполнит логику которая в неё заложена, 
 если вызвать вне цикла событий, то вернёт объект корутины
 """
-

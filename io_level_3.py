@@ -8,7 +8,6 @@
 6. Учитывать производительность, читаемость, дебаггинг и экосистему при выборе.
 """
 
-
 print("asyncio")
 """
 Стандартная библиотека Python.
@@ -18,12 +17,15 @@ Structured concurrency реализован только частично (TaskG
 """
 import asyncio
 
+
 async def work_a(name):
     await asyncio.sleep(1)
     print(f"{name} done")
 
+
 async def main():
     await asyncio.gather(work_a("A"), work_a("B"))
+
 
 asyncio.run(main())
 
@@ -36,14 +38,17 @@ print("trio")
 """
 import trio
 
+
 async def work_t(name):
     await trio.sleep(1)
     print(f"{name} done")
+
 
 async def main():
     async with trio.open_nursery() as nursery:
         nursery.start_soon(work_t, "A")
         nursery.start_soon(work_t, "B")
+
 
 trio.run(main)
 
@@ -60,12 +65,15 @@ import uvloop
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+
 async def work_u(name):
     await asyncio.sleep(1)
     print(f"{name} done")
 
+
 async def main():
     await asyncio.gather(work_u("A"), work_u("B"))
+
 
 asyncio.run(main())
 
@@ -88,13 +96,16 @@ print("Gevent")
 
 import gevent
 from gevent import monkey
+
 monkey.patch_all()
 
 import time
 
+
 def work_g(name):
     time.sleep(1)
     print(f"{name} done")
+
 
 g1 = gevent.spawn(work_g, "A")
 g2 = gevent.spawn(work_g, "B")
@@ -105,18 +116,21 @@ import requests
 
 monkey.patch_all()
 
+
 def download(url):
     print(f"Start {url}")
     response = requests.get(url)
     print(f"Done {url}: {len(response.content)} bytes")
 
-start = time.time()
-gevent.joinall([
-    gevent.spawn(download, 'https://httpbin.org/delay/1'),
-    gevent.spawn(download, 'https://httpbin.org/delay/1'),
-])
-print(f"Took: {time.time() - start:.2f} sec")
 
+start = time.time()
+gevent.joinall(
+    [
+        gevent.spawn(download, "https://httpbin.org/delay/1"),
+        gevent.spawn(download, "https://httpbin.org/delay/1"),
+    ]
+)
+print(f"Took: {time.time() - start:.2f} sec")
 
 
 """
