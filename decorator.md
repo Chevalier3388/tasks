@@ -62,14 +62,14 @@ def timeit(log):
     def wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
-            start = time.time()
+            start = time.monotonic()
             try:
                 res = func(*args, **kwargs)
-                stop = time.time()
+                stop = time.monotonic()
                 log.info(f"{func.__name__}{args, kwargs}: {round(stop - start, 1)} sec")
                 return res
             except:
-                stop = time.time()
+                stop = time.monotonic()
                 return log.error(f"{func.__name__}{args, kwargs}: {round(stop - start, 1)} sec")
         return inner
     return wrapper
@@ -110,11 +110,140 @@ def main():
 5
 None
 ```
+Первым делом нужно, что бы декоратор возвращал нужное нам значение:
+- ```f(1) [INFO] f(1): 1.1 sec```
+- ```f('1')[ERROR] f('1'): 0.1 sec```
+- 
+Для этого мы отредактируем вывод сообщения:
+введём дополнительную переменную - flag(она нам будет сигнализировать что выводить):
+- Если True - будет INFO
+- Если False - будет ERROR
+
+Также воспользуемся конструкцией try, except, finally, else и 
+перенесём логику вывода в finally(ибо этот блок конструкции будет в любом случае, не зависимо от обстоятельств)
 
 
+``` python
+def timeit(log):
+    def wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            flag = True
+            start = time.monotonic()
+            try:
+                return func(*args, **kwargs)
+            except:
+                flag = False
+                raise
+            finally:  # Добавили блок и перенесли в него логику вывода информации
+                stop = time.monotonic()
+                if flag:
+                    log.info(f"{func.__name__}{args, kwargs}: {round(stop - start, 1)} sec")
+                else:
+                    log.error(f"{func.__name__}{args, kwargs}: {round(stop - start, 1)} sec")
+        return inner
+    return wrapper
+```
 
+Это сделало код понятнее для чтения, но результат остался тот же.
+```python
+{args, kwargs}
+```
+Нужно изменить данное представление в нашем выводе, ибо сейчас оно демонстрирует:
+- ```INFO f((1,), {}): 1.0 sec```
+- ```ERROR f(('1',), {}): 0.0 sec```
 
+Для изменения и удобства чтения мы выносим его в отдельную переменную и 
+соединяем всё в одну строку с помощью функции ```", ".join()```:
 
+```func_param = ", ".join([repr(arg) for arg in args] + [f"{key}={repr(value)}" for key, value in kwargs.items()])```
+А ещё в фоорматируем сам логер, что бы ответ был приближен к заданию:
+```python
+format="[%(levelname)s] %(message)s"
+```
+Мы добавили квадратные скобки [ ]
 
+Так же мы вынесли  ```{round(stop - start, 1)}``` в отдельную переменную delta: ```delta = stop - start```
 
-[ссылка "https://proglib.io"](https://proglib.io/p/samouchitel-po-python-dlya-nachinayushchih-chast-14-funkcii-vysshego-poryadka-zamykaniya-i-dekoratory-2023-01-30)
+```python
+def timeit(log):
+    def wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            start = time.monotonic()
+            params_func = ", ".join(
+                [repr(arg) for arg in args]
+                + [f"{key}={repr(value)}" for key, value in kwargs.items()]
+            )
+            flag = True
+            try:
+                return func(*args, **kwargs)
+            except:
+                flag = False
+                raise
+            finally:  
+                stop = time.monotonic()
+                delta = stop - start
+                if flag:
+                    log.info(f"{func.__name__}({params_func}): {round(delta, 1)} sec")
+                else:
+                    log.error(f"{func.__name__}({params_func}): {round(delta, 1)} sec")
+                
+        return inner
+
+    return wrapper
+```
+
+Всё работает и ответ показывает то, что мы искали, но чувство, что этого будет мало меня не обманывает! 
+Мы начинаем полировать код (Искусство чистого кода)
+
+``` python
+finally:  
+    stop = time.monotonic()
+    if flag:
+        log.info(f"{func.__name__}({func_param}): {round(delta, 1)} sec")
+    else:
+        log.error(f"{func.__name__}({func_param}): {round(delta, 1)} sec")
+```
+Меняем на конструкцию:
+```python
+finally: 
+    stop = time.monotonic()
+    delta = stop - start
+    level = logging.INFO if flag else logging.ERROR
+    log.log(level, "%s(%s) %.1f sec", func.__name__, func_param, delta)
+```
+Тут мы меняем конструкцию, проводим рефакторинг кода и убираем тяжёлые участки кода.
+Это можно посмотреть используя определённые методы вроде:
+1) Memory profiler — это инструмент, который показывает:
+- Сколько памяти используется
+- Какими строками/функциями кода
+- Когда и почему происходит рост использования памяти
+2) tracemalloc — встроенный в Python (c 3.4+), отслеживает источники аллокации памяти.
+3) objgraph — визуализирует ссылки между объектами.
+- Показывает где и какие объекты "застряли" в памяти.
+- может отрисовать граф ссылок между объектами.
+- Помогает понять, почему объект не удаляется — на него может остаться неожиданная ссылка.
+
+Первое и очень важное, мы ушли от использования методов: 
+- log.info
+- log.error
+
+Это методы и они тратят ресурсы, место этого мы определили их уровни:
+- INFO
+- ERROR
+
+Потому как это КОНСТАНТЫ!
+```python
+level = logging.INFO if flag else logging.ERROR 
+```
+Используем переменную, что бы определить уровень, далее в методе log.log используем её. 
+```log.log(level, message, *args)``` — универсальный метод логирования, 
+ты можешь заранее подготовить сообщение и просто вызывать log(...) с нужным уровнем.
+Также мы используем форматирование строки через %s потому как f-строки в логах иногда могут обрабатывать ресурсы, 
+которые обрабатывать не имеет смысла, например если не подходящий уровень. 
+И обработка значений у нас теперь не ```round(delta, 1)```, а обработка идёт в самом сообщение логера через %.1f.
+
+%.1f — стандартное C-подобное форматирование, которое не будет выполняться, 
+если уровень логирования ниже (в отличие от f-строк).
+

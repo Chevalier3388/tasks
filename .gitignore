@@ -44,3 +44,4 @@ docker-compose.override.yml
 .DS_Store
 *.swp
 task_test.py
+closures_in_python.py
