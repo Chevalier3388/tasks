@@ -45,3 +45,5 @@ docker-compose.override.yml
 *.swp
 task_test.py
 closures_in_python.py
+/test_task_1.py
+/pyproject.toml
