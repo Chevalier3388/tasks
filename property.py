@@ -29,3 +29,5 @@ print(person.full_name)
 
 del person.full_name
 print(person.full_name)
+
+
