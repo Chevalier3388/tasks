@@ -8,7 +8,7 @@ from datetime import datetime
 plt.style.use('seaborn-v0_8')  # Или другой доступный стиль
 sns.set_theme(style="whitegrid")  # Современный способ установки стиля в seaborn
 
-API_KEY = "Ваш API-ключ"  # Замените на реальный ключ с сайта!
+API_KEY = "Ваш API-ключ"  # Замените на реальный ключ с сайта openweathermap.org!
 CITY = input("Введите город (например: Moscow, London, Berlin): ")
 URL = f"http://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
 
